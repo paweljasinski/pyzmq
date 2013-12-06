@@ -16,7 +16,7 @@ Authors
 
 import sys
 
-if sys.version_info[0] >= 3:
+if sys.version_info[0] >= 3 or sys.platform == 'cli':
     bytes = bytes
     unicode = str
     basestring = (bytes, unicode)
@@ -25,23 +25,43 @@ else:
     bytes = str
     basestring = basestring
 
-def cast_bytes(s, encoding='utf8'):
-    """cast unicode or bytes to bytes"""
-    if isinstance(s, bytes):
-        return s
-    elif isinstance(s, unicode):
-        return s.encode(encoding)
-    else:
-        raise TypeError("Expected unicode or bytes, got %r" % s)
+if sys.platform != 'cli':
+    def cast_bytes(s, encoding='utf8'):
+        """cast unicode or bytes to bytes"""
+        if isinstance(s, bytes):
+            return s
+        elif isinstance(s, unicode):
+            return s.encode(encoding)
+        else:
+            raise TypeError("Expected unicode or bytes, got %r" % s)
 
-def cast_unicode(s, encoding='utf8'):
-    """cast bytes or unicode to unicode"""
-    if isinstance(s, bytes):
-        return s.decode(encoding)
-    elif isinstance(s, unicode):
-        return s
-    else:
-        raise TypeError("Expected unicode or bytes, got %r" % s)
+    def cast_unicode(s, encoding='utf8'):
+        """cast bytes or unicode to unicode"""
+        if isinstance(s, bytes):
+            return s.decode(encoding)
+        elif isinstance(s, unicode):
+            return s
+        else:
+            raise TypeError("Expected unicode or bytes, got %r" % s)
+else:
+    def cast_bytes(s, encoding='utf8'):
+        """cast unicode or bytes to bytes"""
+        if isinstance(s, bytes):
+            return s
+        elif isinstance(s, unicode):
+            return bytes(s, encoding)
+        else:
+            raise TypeError("Expected unicode or bytes, got %r" % s)
+
+    def cast_unicode(s, encoding='utf8'):
+        """cast bytes or unicode to unicode"""
+        if isinstance(s, bytes):
+            return s.decode(encoding)
+        elif isinstance(s, unicode):
+            return s
+        else:
+            raise TypeError("Expected unicode or bytes, got %r" % s)
+
 
 # give short 'b' alias for cast_bytes, so that we can use fake b('stuff')
 # to simulate b'stuff'

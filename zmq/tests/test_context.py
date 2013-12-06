@@ -18,7 +18,7 @@ from threading import Thread, Event
 
 import zmq
 from zmq.tests import (
-    BaseZMQTestCase, have_gevent, GreenTest, skip_green, PYPY, SkipTest,
+    BaseZMQTestCase, have_gevent, GreenTest, skip_green, PYPY, SkipTest
 )
 
 
@@ -101,7 +101,6 @@ class TestContext(BaseZMQTestCase):
         
         ctx.term()
 
-    
     def test_destroy(self):
         """Context.destroy should close sockets"""
         ctx = self.Context()
@@ -139,7 +138,7 @@ class TestContext(BaseZMQTestCase):
         s.close()
         t.join(timeout=0.1)
         self.assertFalse(t.is_alive(), "Context should have closed")
-    
+
     def test_gc(self):
         """test close&term by garbage collection alone"""
         if PYPY:
@@ -154,9 +153,9 @@ class TestContext(BaseZMQTestCase):
             gc.collect()
         t = Thread(target=gcf)
         t.start()
-        t.join(timeout=1)
+        t.join(timeout=2)
         self.assertFalse(t.is_alive(), "Garbage collection should have cleaned up context")
-    
+
     def test_cyclic_destroy(self):
         """ctx.destroy should succeed when cyclic ref prevents gc"""
         # test credit @dln (GH #137):
@@ -204,7 +203,7 @@ class TestContext(BaseZMQTestCase):
         ctx.term()
         t.join(timeout=1)
         self.assertFalse(t.is_alive(), "term should have interrupted s.recv()")
-    
+
     def test_destroy_no_sockets(self):
         ctx = self.Context()
         s = ctx.socket(zmq.PUB)
@@ -213,6 +212,13 @@ class TestContext(BaseZMQTestCase):
         ctx.destroy()
         assert s.closed
         assert ctx.closed
+
+    def test_with(self):
+        with self.Context() as ctx:
+            with ctx.socket(zmq.PUB) as s:
+                self.assertNotEqual(ctx, None)
+                self.assertNotEqual(s, None)
+                s.bind_to_random_port('tcp://127.0.0.1')
 
 
 if False: # disable green context tests

@@ -20,7 +20,7 @@ from .constants import POLLIN, POLLOUT, POLLERR
 #-----------------------------------------------------------------------------
 # Polling related methods
 #-----------------------------------------------------------------------------
-
+import minilog
 
 class Poller(object):
     """A stateful poll interface that mirrors Python's built-in poll."""
@@ -51,6 +51,8 @@ class Poller(object):
             If `flags=0`, socket will be unregistered.
         """
         if flags:
+            minilog.log("register or modify: " + str( socket) +  ' ' + str(type(socket)))
+
             if socket in self._map:
                 idx = self._map[socket]
                 self.sockets[idx] = (socket, flags)
@@ -103,6 +105,13 @@ class Poller(object):
             It is common to call ``events = dict(poller.poll())``,
             which turns the list of tuples into a mapping of ``socket : event``.
         """
+        tmp = "polling for:\n"
+        for s in self.sockets:
+            tmp += (str(s[0])+ " "+ str(type(s[0])))
+            if isinstance(s[0], zmq.sugar.socket.Socket):
+                tmp += " debugAddr:" + "\n".join(s[0].debugAddr)
+            tmp += '\n'
+        minilog.log(tmp)
         if timeout is None or timeout < 0:
             timeout = -1
         elif isinstance(timeout, float):

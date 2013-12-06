@@ -20,7 +20,7 @@ Authors
 #-----------------------------------------------------------------------------
 
 import zmq
-from zmq.devices.basedevice import Device, ThreadDevice, ProcessDevice
+from zmq.devices.basedevice import Device, ThreadDevice #, ProcessDevice
 
 #-----------------------------------------------------------------------------
 # Classes
@@ -98,13 +98,13 @@ class ThreadProxy(ProxyBase, ThreadDevice):
     """Proxy in a Thread. See Proxy for more."""
     pass
 
-class ProcessProxy(ProxyBase, ProcessDevice):
-    """Proxy in a Process. See Proxy for more."""
-    pass
+#class ProcessProxy(ProxyBase, ProcessDevice):
+#    """Proxy in a Process. See Proxy for more."""
+#    pass
 
 
 __all__ = [
     'Proxy',
     'ThreadProxy',
-    'ProcessProxy',
+#    'ProcessProxy',
 ]

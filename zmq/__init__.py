@@ -24,6 +24,7 @@ here = os.path.dirname(__file__)
 
 bundled = []
 for ext in ('pyd', 'so', 'dll', 'dylib'):
+    bundled.extend(glob.glob(os.path.join(here, "clrzmq*.%s*" % ext)))
     bundled.extend(glob.glob(os.path.join(here, 'libzmq*.%s*' % ext)))
 
 if bundled:
@@ -31,6 +32,10 @@ if bundled:
     if bundled[0].endswith('.pyd'):
         # a Windows Extension
         _libzmq = ctypes.cdll.LoadLibrary(bundled[0])
+    elif bundled[0].find('clrzmq') != -1 and bundled[0].endswith('.dll'):
+        # ironpython
+        import clr
+        clr.AddReferenceToFileAndPath(bundled[0])
     else:
         _libzmq = ctypes.CDLL(bundled[0], mode=ctypes.RTLD_GLOBAL)
     del ctypes
@@ -47,7 +52,7 @@ else:
 
 # init Python threads
 
-if 'PyPy' not in sys.version:
+if 'PyPy' not in sys.version and sys.platform != 'cli':
     try:
         from zmq.utils import initthreads # initialize threads
     except ImportError as e:

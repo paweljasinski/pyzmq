@@ -3,6 +3,7 @@ from __future__ import absolute_import, division, print_function, with_statement
 
 import errno
 import socket
+import sys
 
 from . import interface
 
@@ -73,7 +74,10 @@ class Waker(interface.Waker):
 
     def wake(self):
         try:
-            self.writer.send(b"x")
+            if sys.platform != 'cli':
+                self.writer.send(b"x")
+            else:
+                self.writer.send("x")
         except (IOError, socket.error):
             pass
 

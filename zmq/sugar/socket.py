@@ -16,6 +16,7 @@
 
 import random
 import codecs
+import sys
 
 import zmq
 from zmq.backend import Socket as SocketBase
@@ -38,6 +39,7 @@ try:
 except:
     cPickle = None
     import pickle
+import minilog
 
 #-----------------------------------------------------------------------------
 # Code
@@ -55,6 +57,14 @@ class Socket(SocketBase, AttributeSetter):
         s = ctx.socket(zmq.ROUTER)
     
     """
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        self.close()
+        return False
+
 
     #-------------------------------------------------------------------------
     # Hooks for sockopt completion
@@ -75,7 +85,7 @@ class Socket(SocketBase, AttributeSetter):
     #-------------------------------------------------------------------------
     setsockopt = SocketBase.set
     getsockopt = SocketBase.get
-    
+
     def set_string(self, option, optval, encoding='utf-8'):
         """set socket options with a unicode object
         
@@ -95,7 +105,10 @@ class Socket(SocketBase, AttributeSetter):
         """
         if not isinstance(optval, unicode):
             raise TypeError("unicode strings only")
-        return self.set(option, optval.encode(encoding))
+        if sys.platform != 'cli': 
+            return self.set(option, optval.encode(encoding))
+        else:
+            return self.set(option, bytes(optval, encoding))
     
     setsockopt_unicode = setsockopt_string = set_string
     
@@ -187,7 +200,7 @@ class Socket(SocketBase, AttributeSetter):
                 raised = e
             try:
                 self.rcvhwm = value
-            except Exception:
+            except Exception as e:
                 raised = e
             
             if raised:
@@ -287,7 +300,10 @@ class Socket(SocketBase, AttributeSetter):
         """
         if not isinstance(u, basestring):
             raise TypeError("unicode/str objects only")
-        return self.send(u.encode(encoding), flags=flags, copy=copy)
+        if sys.platform != 'cli':
+            return self.send(u.encode(encoding), flags=flags, copy=copy)
+        else:
+            return self.send(bytes(u, encoding), flags=flags, copy=copy)
     
     send_unicode = send_string
     
@@ -326,7 +342,10 @@ class Socket(SocketBase, AttributeSetter):
             support.
         """
         msg = pickle.dumps(obj, protocol)
-        return self.send(msg, flags)
+        if sys.platform != 'cli':
+            return self.send(msg, flags)
+        else:
+            return self.send(bytes(msg, "iso-8859-1"), flags)
 
     def recv_pyobj(self, flags=0):
         """receive a Python object as a message using pickle to serialize
@@ -342,7 +361,10 @@ class Socket(SocketBase, AttributeSetter):
             The Python object that arrives as a message.
         """
         s = self.recv(flags)
-        return pickle.loads(s)
+        if sys.platform != 'cli':
+            return pickle.loads(s)
+        else:
+            return pickle.loads(s.decode("iso-8859-1"))
 
     def send_json(self, obj, flags=0):
         """send a Python object as a message using json to serialize
@@ -358,7 +380,10 @@ class Socket(SocketBase, AttributeSetter):
             raise ImportError('jsonlib{1,2}, json or simplejson library is required.')
         else:
             msg = jsonapi.dumps(obj)
-            return self.send(msg, flags)
+            if sys.platform != 'cli':
+                return self.send(msg, flags)
+            else:
+                return self.send(bytes(msg, "iso-8859-1"), flags)
 
     def recv_json(self, flags=0):
         """receive a Python object as a message using json to serialize

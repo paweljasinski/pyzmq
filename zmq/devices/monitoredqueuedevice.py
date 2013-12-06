@@ -20,7 +20,7 @@ Authors
 #-----------------------------------------------------------------------------
 
 from zmq import ZMQError, PUB
-from zmq.devices.proxydevice import ProxyBase, Proxy, ThreadProxy, ProcessProxy
+from zmq.devices.proxydevice import ProxyBase, Proxy, ThreadProxy #, ProcessProxy
 from zmq.devices.monitoredqueue import monitored_queue
 
 #-----------------------------------------------------------------------------
@@ -71,15 +71,15 @@ class ThreadMonitoredQueue(MonitoredQueueBase, ThreadProxy):
     pass
 
 
-class ProcessMonitoredQueue(MonitoredQueueBase, ProcessProxy):
-    """Run zmq.monitored_queue in a background thread.
-    
-    See MonitoredQueue and Proxy for details.
-    """
+#class ProcessMonitoredQueue(MonitoredQueueBase, ProcessProxy):
+#    """Run zmq.monitored_queue in a background thread.
+#    
+#    See MonitoredQueue and Proxy for details.
+#    """
 
 
 __all__ = [
     'MonitoredQueue',
     'ThreadMonitoredQueue',
-    'ProcessMonitoredQueue'
+#    'ProcessMonitoredQueue'
 ]

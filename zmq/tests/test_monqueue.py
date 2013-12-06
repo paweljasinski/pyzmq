@@ -17,15 +17,16 @@ from unittest import TestCase
 import zmq
 from zmq import devices
 
-from zmq.tests import BaseZMQTestCase, SkipTest, PYPY
+from zmq.tests import BaseZMQTestCase, SkipTest, PYPY, Iron
 from zmq.utils.strtypes import unicode
 
 #-----------------------------------------------------------------------------
 # Tests
 #-----------------------------------------------------------------------------
-if PYPY:
+if PYPY or Iron:
     # cleanup of shared Context doesn't work on PyPy
     devices.Device.context_factory = zmq.Context
+
 
 class TestMonitoredQueue(BaseZMQTestCase):
     
@@ -210,7 +211,7 @@ class TestMonitoredQueue(BaseZMQTestCase):
                     pass
         msg = [ b'hello', b'there' ]
         a.send_multipart([b'b']+msg)
-        bmsg = self.recv_multipart(b)
+        bmsg = self.recv_multipart(b) # sometimes iron fails here
         self.assertEqual(bmsg, [b'a']+msg)
         b.send_multipart(bmsg)
         amsg = self.recv_multipart(a)

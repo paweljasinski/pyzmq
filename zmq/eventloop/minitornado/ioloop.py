@@ -46,6 +46,8 @@ from .log import app_log, gen_log
 from . import stack_context
 from .util import Configurable
 
+import minilog
+
 try:
     import signal
 except ImportError:
@@ -553,6 +555,7 @@ class PollIOLoop(IOLoop):
                           action if action is not None else signal.SIG_DFL)
 
     def start(self):
+        minilog.log("entering start of the: " + str(self))
         if not logging.getLogger().handlers:
             # The IOLoop catches and logs exceptions, so it's
             # important that log output be visible.  However, python's
@@ -602,6 +605,7 @@ class PollIOLoop(IOLoop):
                 pass
 
         while True:
+            minilog.log("top of the poller loop")
             poll_timeout = 3600.0
 
             # Prevent IO event starvation by delaying new callbacks
@@ -649,8 +653,10 @@ class PollIOLoop(IOLoop):
                 signal.setitimer(signal.ITIMER_REAL, 0, 0)
 
             try:
+                minilog.log("about to call poll on:" + str(self._impl))
                 event_pairs = self._impl.poll(poll_timeout)
             except Exception as e:
+                minilog.log("caught exception: " + str(e))
                 # Depending on python version and IOLoop implementation,
                 # different exception types may be thrown and there are
                 # two ways EINTR might be signaled:
