@@ -29,11 +29,7 @@ class TestStopWatch(TestCase):
         watch = Stopwatch()
         watch.start()
         us = watch.stop()
-        if sys.platform != 'cli':
-            self.assertTrue(isinstance(us, long))
-        else:
-            import System
-            self.assertTrue(isinstance(us, System.Int64))
+        self.assertTrue(isinstance(us, long))
         
     def test_stop_microseconds(self):
         """Test that stop/sleep have right units."""

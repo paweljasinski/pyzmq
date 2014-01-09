@@ -109,7 +109,7 @@ class Poller(object):
         for s in self.sockets:
             tmp += (str(s[0])+ " "+ str(type(s[0])))
             if isinstance(s[0], zmq.sugar.socket.Socket):
-                tmp += " debugAddr:" + "\n".join(s[0].debugAddr)
+                tmp += " debugAddr:" + "\n".join(getattr(s[0],'debugAddr', 'missing'))
             tmp += '\n'
         minilog.log(tmp)
         if timeout is None or timeout < 0:

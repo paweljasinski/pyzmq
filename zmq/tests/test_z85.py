@@ -18,13 +18,11 @@ confirm values and roundtrip with test values from the reference implementation.
 
 from unittest import TestCase
 from zmq.utils import z85
-from zmq.tests import skip_iron
 
 #-----------------------------------------------------------------------------
 # Tests
 #-----------------------------------------------------------------------------
 
-@skip_iron # TODO
 class TestZ85(TestCase):
 
     def test_client_public(self):

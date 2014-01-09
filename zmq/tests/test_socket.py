@@ -294,7 +294,6 @@ class TestSocket(BaseZMQTestCase):
         self.assertEqual(linger, s.getsockopt(zmq.LINGER))
         self.assertEqual(s.fd, s.getsockopt(zmq.FD))
    
-    @skip_iron
     def test_bad_attr(self):
         s = self.context.socket(zmq.DEALER)
         self.sockets.append(s)
