@@ -366,6 +366,7 @@ class TestSocket(BaseZMQTestCase):
         self.assertTrue(zmq.IPC_PATH_MAX_LEN > 30, msg)
         self.assertTrue(zmq.IPC_PATH_MAX_LEN < 1025, msg)
 
+    @skip_iron # ipc not supported
     def test_ipc_path_max_length_msg(self):
         if zmq.IPC_PATH_MAX_LEN == 0:
             raise SkipTest("IPC_PATH_MAX_LEN undefined")
