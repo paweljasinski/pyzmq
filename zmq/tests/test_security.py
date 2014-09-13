@@ -5,6 +5,7 @@
 # Distributed under the terms of the Modified BSD License.
 
 import os
+import sys
 from threading import Thread
 
 import zmq
@@ -72,7 +73,11 @@ class TestSecurity(BaseZMQTestCase):
         self.zap_thread.join()
 
     def bounce(self, server, client, test_metadata=True):
-        msg = [os.urandom(64), os.urandom(64)]
+        if sys.platform != 'cli':
+            msg = [os.urandom(64), os.urandom(64)]
+        else:
+            msg = [bytes(os.urandom(64), 'iso-8859-1'),
+                   bytes(os.urandom(64), 'iso-8859-1')]
         client.send_multipart(msg)
         frames = self.recv_multipart(server, copy=False)
         recvd = list(map(lambda x: x.bytes, frames))
@@ -126,6 +131,10 @@ class TestSecurity(BaseZMQTestCase):
         
         self.start_zap()
         
+        if sys.platform == 'cli':
+            # give zap a chance to start
+            import time
+            time.sleep(0.1)
         iface = 'tcp://127.0.0.1'
         port = server.bind_to_random_port(iface)
         client.connect("%s:%i" % (iface, port))

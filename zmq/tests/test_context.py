@@ -8,7 +8,7 @@ from threading import Thread, Event
 
 import zmq
 from zmq.tests import (
-    BaseZMQTestCase, have_gevent, GreenTest, skip_green, PYPY, SkipTest,
+    BaseZMQTestCase, have_gevent, GreenTest, skip_green, PYPY, SkipTest, skip_iron
 )
 
 
@@ -129,6 +129,7 @@ class TestContext(BaseZMQTestCase):
         t.join(timeout=0.1)
         self.assertFalse(t.is_alive(), "Context should have closed")
     
+    @skip_iron
     def test_gc(self):
         """test close&term by garbage collection alone"""
         if PYPY:

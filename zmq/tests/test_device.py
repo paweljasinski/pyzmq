@@ -5,7 +5,7 @@ import time
 
 import zmq
 from zmq import devices
-from zmq.tests import BaseZMQTestCase, SkipTest, have_gevent, GreenTest, PYPY
+from zmq.tests import BaseZMQTestCase, SkipTest, have_gevent, GreenTest, PYPY, skip_iron
 from zmq.utils.strtypes import (bytes,unicode,basestring)
 
 if PYPY:
@@ -36,7 +36,7 @@ class TestDevice(BaseZMQTestCase):
         self.assertEqual(dev.daemon, True)
         del dev
         
-    
+    @skip_iron # TODO
     def test_single_socket_forwarder_connect(self):
         dev = devices.ThreadDevice(zmq.QUEUE, zmq.REP, -1)
         req = self.context.socket(zmq.REQ)
@@ -61,6 +61,7 @@ class TestDevice(BaseZMQTestCase):
         del dev
         req.close()
         
+    @skip_iron # TODO
     def test_single_socket_forwarder_bind(self):
         dev = devices.ThreadDevice(zmq.QUEUE, zmq.REP, -1)
         # select random port:
@@ -95,6 +96,7 @@ class TestDevice(BaseZMQTestCase):
         del dev
         req.close()
     
+    @skip_iron # TODO
     def test_proxy(self):
         if zmq.zmq_version_info() < (3,2):
             raise SkipTest("Proxies only in libzmq >= 3")

@@ -7,11 +7,11 @@ from unittest import TestCase
 import zmq
 from zmq import devices
 
-from zmq.tests import BaseZMQTestCase, SkipTest, PYPY
+from zmq.tests import BaseZMQTestCase, SkipTest, PYPY, Iron
 from zmq.utils.strtypes import unicode
 
 
-if PYPY or zmq.zmq_version_info() >= (4,1):
+if PYPY or zmq.zmq_version_info() >= (4,1) or Iron:
     # cleanup of shared Context doesn't work on PyPy
     # there also seems to be a bug in cleanup in libzmq-4.1 (zeromq/libzmq#1052)
     devices.Device.context_factory = zmq.Context
@@ -37,7 +37,7 @@ class TestMonitoredQueue(BaseZMQTestCase):
         self.device.connect_out("tcp://127.0.0.1:%i"%bport)
         self.device.connect_mon("tcp://127.0.0.1:%i"%mport)
         self.device.start()
-        time.sleep(.2)
+        time.sleep(.3)
         try:
             # this is currenlty necessary to ensure no dropped monitor messages
             # see LIBZMQ-248 for more info
@@ -200,7 +200,7 @@ class TestMonitoredQueue(BaseZMQTestCase):
                     pass
         msg = [ b'hello', b'there' ]
         a.send_multipart([b'b']+msg)
-        bmsg = self.recv_multipart(b)
+        bmsg = self.recv_multipart(b) # sometimes iron used to fail here
         self.assertEqual(bmsg, [b'a']+msg)
         b.send_multipart(bmsg)
         amsg = self.recv_multipart(a)

@@ -9,7 +9,7 @@ import warnings
 
 import zmq
 from zmq.tests import (
-    BaseZMQTestCase, SkipTest, have_gevent, GreenTest, skip_pypy, skip_if
+    BaseZMQTestCase, SkipTest, have_gevent, GreenTest, skip_pypy, skip_if, skip_iron, Iron
 )
 from zmq.utils.strtypes import bytes, unicode
 
@@ -205,6 +205,7 @@ class TestSocket(BaseZMQTestCase):
         self.assertEqual(s,u)
     
     @skip_pypy
+    @skip_iron
     def test_tracker(self):
         "test the MessageTracker object for tracking when zmq is done with a buffer"
         addr = 'tcp://127.0.0.1'
@@ -424,6 +425,15 @@ class TestSocket(BaseZMQTestCase):
         a.send(b'hi')
         rcvd = self.recv(b)
         self.assertEqual(rcvd, b'hi')
+
+    def test_with(self):
+        with self.Context() as ctx:
+            with ctx.socket(zmq.PUB) as socket:
+                self.assertNotEqual(ctx, None)
+                self.assertNotEqual(socket, None)
+                socket.bind_to_random_port('tcp://127.0.0.1')
+            assert socket.closed
+        assert ctx.closed
 
 
 if have_gevent:
