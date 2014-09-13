@@ -387,12 +387,7 @@ class Socket(SocketBase, AttributeSetter):
             The Python object that arrives as a message.
         """
         s = self.recv(flags)
-        if sys.platform != 'cli':
-            return pickle.loads(s)
-        else:
-            # TODO: this may no longer be necessary, 191142bbf86
-            return pickle.loads(s.decode("iso-8859-1"))
-
+        return pickle.loads(s)
 
     def send_json(self, obj, flags=0, **kwargs):
         """send a Python object as a message using json to serialize
