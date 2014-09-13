@@ -214,6 +214,7 @@ class TestContext(BaseZMQTestCase):
         self.assertEqual(ctx.max_sockets, 100)
         self.assertEqual(ctx.get(zmq.MAX_SOCKETS), 100)
     
+    @skip_iron
     def test_shadow(self):
         ctx = self.Context()
         ctx2 = self.Context.shadow(ctx.underlying)

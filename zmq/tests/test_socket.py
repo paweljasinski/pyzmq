@@ -394,6 +394,7 @@ class TestSocket(BaseZMQTestCase):
                     pass
             s.close()
     
+    @skip_iron
     def test_shadow(self):
         p = self.socket(zmq.PUSH)
         p.bind("tcp://127.0.0.1:5555")
