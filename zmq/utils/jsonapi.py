@@ -16,7 +16,6 @@ Priority: ``simplejson`` > ``jsonlib2`` > stdlib ``json``
 # Distributed under the terms of the Modified BSD License.
 
 from zmq.utils.strtypes import bytes, unicode, IRONPYTHON2
-import sys
 
 jsonmod = None
 

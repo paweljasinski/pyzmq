@@ -13,7 +13,6 @@
 import random
 import codecs
 import ctypes
-import sys
 
 import errno as errno_mod
 
@@ -32,10 +31,6 @@ class Socket(object):
     _zmq_socket = None
     _closed = None
     _ref = None
-    @staticmethod
-    def hd(b):
-        for c in b:
-            print "%04x" % ord(c)
 
     def __init__(self, context, sock_type):
         self.context = context

@@ -7,7 +7,6 @@
 
 import codecs
 import random
-import sys
 import warnings
 
 import zmq
@@ -301,11 +300,6 @@ class Socket(SocketBase, AttributeSetter):
             parts.append(part)
     
         return parts
-
-    @staticmethod
-    def hd(b):
-        for c in b:
-            print "%04x" % ord(c)
 
     def send_string(self, u, flags=0, copy=True, encoding='utf-8'):
         """send a Python unicode string as a message with an encoding

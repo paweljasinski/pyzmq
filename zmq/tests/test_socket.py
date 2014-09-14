@@ -94,7 +94,7 @@ class TestSocket(BaseZMQTestCase):
         identu = identb.decode('utf16')
         identu2 = s.getsockopt_unicode(zmq.IDENTITY, 'utf16')
         self.assertEqual(identu, identu2)
-        time.sleep(0.5) # wait for connection/subscription
+        time.sleep(0.1) # wait for connection/subscription
         p.send_unicode(topic,zmq.SNDMORE)
         p.send_unicode(topic*2, encoding='latin-1')
         self.assertEqual(topic, s.recv_unicode())
