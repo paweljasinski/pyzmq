@@ -10,7 +10,7 @@ from threading import Thread
 
 import zmq
 from zmq.tests import (
-    BaseZMQTestCase, SkipTest, PYPY
+    BaseZMQTestCase, SkipTest, PYPY, IRONPYTHON2
 )
 from zmq.utils import z85
 
@@ -73,7 +73,7 @@ class TestSecurity(BaseZMQTestCase):
         self.zap_thread.join()
 
     def bounce(self, server, client, test_metadata=True):
-        if sys.platform != 'cli':
+        if not IRONPYTHON2:
             msg = [os.urandom(64), os.urandom(64)]
         else:
             msg = [bytes(os.urandom(64), 'iso-8859-1'),
@@ -131,7 +131,7 @@ class TestSecurity(BaseZMQTestCase):
         
         self.start_zap()
         
-        if sys.platform == 'cli':
+        if IRONPYTHON2:
             # give zap a chance to start
             import time
             time.sleep(0.1)

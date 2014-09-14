@@ -19,7 +19,9 @@ else:
     bytes = str
     basestring = basestring
 
-if sys.platform != 'cli':
+IRONPYTHON2 = sys.version_info[0] < 3 and sys.platform == 'cli'
+
+if not IRONPYTHON2:
     def cast_bytes(s, encoding='utf8', errors='strict'):
         """cast unicode or bytes to bytes"""
         if isinstance(s, bytes):

@@ -9,7 +9,7 @@ import warnings
 
 import zmq
 from zmq.tests import (
-    BaseZMQTestCase, SkipTest, have_gevent, GreenTest, skip_pypy, skip_if, skip_iron, Iron
+    BaseZMQTestCase, SkipTest, have_gevent, GreenTest, skip_pypy, skip_if, skip_ironpython, IRONPYTHON2
 )
 from zmq.utils.strtypes import bytes, unicode
 
@@ -79,19 +79,22 @@ class TestSocket(BaseZMQTestCase):
         p,s = self.create_bound_pair(zmq.PUB, zmq.SUB)
         self.assertEqual(s.send_unicode, s.send_unicode)
         self.assertEqual(p.recv_unicode, p.recv_unicode)
-        self.assertRaises(TypeError, s.setsockopt, zmq.SUBSCRIBE, topic)
-        self.assertRaises(TypeError, s.setsockopt, zmq.IDENTITY, topic)
+        if not IRONPYTHON2:
+            # ironpython version does not throw TypeError on unicode argument
+            self.assertRaises(TypeError, s.setsockopt, zmq.SUBSCRIBE, topic)
+            self.assertRaises(TypeError, s.setsockopt, zmq.IDENTITY, topic)
         s.setsockopt_unicode(zmq.IDENTITY, topic, 'utf16')
-        self.assertRaises(TypeError, s.setsockopt, zmq.AFFINITY, topic)
+        if not IRONPYTHON2:
+            # ironpython version does not throw TypeError on unicode argument
+            self.assertRaises(TypeError, s.setsockopt, zmq.AFFINITY, topic)
         s.setsockopt_unicode(zmq.SUBSCRIBE, topic)
         self.assertRaises(TypeError, s.getsockopt_unicode, zmq.AFFINITY)
         self.assertRaisesErrno(zmq.EINVAL, s.getsockopt_unicode, zmq.SUBSCRIBE)
-        
         identb = s.getsockopt(zmq.IDENTITY)
         identu = identb.decode('utf16')
         identu2 = s.getsockopt_unicode(zmq.IDENTITY, 'utf16')
         self.assertEqual(identu, identu2)
-        time.sleep(0.1) # wait for connection/subscription
+        time.sleep(0.5) # wait for connection/subscription
         p.send_unicode(topic,zmq.SNDMORE)
         p.send_unicode(topic*2, encoding='latin-1')
         self.assertEqual(topic, s.recv_unicode())
@@ -194,8 +197,10 @@ class TestSocket(BaseZMQTestCase):
         u = "çπ§"
         if str is not unicode:
             u = u.decode('utf8')
-        self.assertRaises(TypeError, a.send, u,copy=False)
-        self.assertRaises(TypeError, a.send, u,copy=True)
+        if not IRONPYTHON2:
+            # Ironpython2 accepts unicode and interpret as bytes
+            self.assertRaises(TypeError, a.send, u,copy=False)
+            self.assertRaises(TypeError, a.send, u,copy=True)
         a.send_unicode(u)
         s = b.recv()
         self.assertEqual(s,u.encode('utf8'))
@@ -205,7 +210,7 @@ class TestSocket(BaseZMQTestCase):
         self.assertEqual(s,u)
     
     @skip_pypy
-    @skip_iron
+    @skip_ironpython
     def test_tracker(self):
         "test the MessageTracker object for tracking when zmq is done with a buffer"
         addr = 'tcp://127.0.0.1'
@@ -366,7 +371,7 @@ class TestSocket(BaseZMQTestCase):
         self.assertTrue(zmq.IPC_PATH_MAX_LEN > 30, msg)
         self.assertTrue(zmq.IPC_PATH_MAX_LEN < 1025, msg)
 
-    @skip_iron # ipc not supported
+    @skip_ironpython # ipc not supported
     def test_ipc_path_max_length_msg(self):
         if zmq.IPC_PATH_MAX_LEN == 0:
             raise SkipTest("IPC_PATH_MAX_LEN undefined")
@@ -395,7 +400,7 @@ class TestSocket(BaseZMQTestCase):
                     pass
             s.close()
     
-    @skip_iron
+    @skip_ironpython
     def test_shadow(self):
         p = self.socket(zmq.PUSH)
         p.bind("tcp://127.0.0.1:5555")

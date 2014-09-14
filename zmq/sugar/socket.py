@@ -127,11 +127,7 @@ class Socket(SocketBase, AttributeSetter):
         """
         if not isinstance(optval, unicode):
             raise TypeError("unicode strings only")
-        if sys.platform != 'cli':
-            return self.set(option, optval.encode(encoding))
-        else:
-            # TODO: is this right?
-            return self.set(option, bytes(optval, encoding))
+        return self.set(option, optval.encode(encoding))
     
     setsockopt_unicode = setsockopt_string = set_string
     
@@ -306,6 +302,11 @@ class Socket(SocketBase, AttributeSetter):
     
         return parts
 
+    @staticmethod
+    def hd(b):
+        for c in b:
+            print "%04x" % ord(c)
+
     def send_string(self, u, flags=0, copy=True, encoding='utf-8'):
         """send a Python unicode string as a message with an encoding
     
@@ -323,11 +324,7 @@ class Socket(SocketBase, AttributeSetter):
         """
         if not isinstance(u, basestring):
             raise TypeError("unicode/str objects only")
-        if sys.platform != 'cli':
-             return self.send(u.encode(encoding), flags=flags, copy=copy)
-        else:
-            # TODO: is this right
-            return self.send(bytes(u, encoding), flags=flags, copy=copy)
+        return self.send(u.encode(encoding), flags=flags, copy=copy)
 
     send_unicode = send_string
     
@@ -366,12 +363,7 @@ class Socket(SocketBase, AttributeSetter):
             support.
         """
         msg = pickle.dumps(obj, protocol)
-        if sys.platform != 'cli':
-            return self.send(msg, flags)
-        else:
-            # TODO: check if this is still the case
-            return self.send(bytes(msg, "iso-8859-1"), flags)
-
+        return self.send(msg, flags)
 
     def recv_pyobj(self, flags=0):
         """receive a Python object as a message using pickle to serialize

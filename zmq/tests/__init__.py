@@ -28,7 +28,8 @@ except ImportError:
             pass
 
 PYPY = 'PyPy' in sys.version
-Iron = 'cli'  in sys.platform
+IRONPYTHON = 'cli' in sys.platform
+IRONPYTHON2 = IRONPYTHON and sys.version_info[0] == 2
 
 #-----------------------------------------------------------------------------
 # skip decorators (directly from unittest)
@@ -61,7 +62,7 @@ def skip_if(condition, reason="Skipped"):
     return _id
 
 skip_pypy = skip_if(PYPY, "Doesn't work on PyPy")
-skip_iron = skip_if(Iron, "Doesn't work on IronPython")
+skip_ironpython = skip_if(IRONPYTHON, "Doesn't work on IronPython")
 
 #-----------------------------------------------------------------------------
 # Base test class

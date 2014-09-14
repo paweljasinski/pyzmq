@@ -8,7 +8,7 @@ from threading import Thread, Event
 
 import zmq
 from zmq.tests import (
-    BaseZMQTestCase, have_gevent, GreenTest, skip_green, PYPY, SkipTest, skip_iron
+    BaseZMQTestCase, have_gevent, GreenTest, skip_green, PYPY, SkipTest, skip_ironpython
 )
 
 
@@ -129,7 +129,7 @@ class TestContext(BaseZMQTestCase):
         t.join(timeout=0.1)
         self.assertFalse(t.is_alive(), "Context should have closed")
     
-    @skip_iron
+    @skip_ironpython
     def test_gc(self):
         """test close&term by garbage collection alone"""
         if PYPY:
@@ -214,7 +214,7 @@ class TestContext(BaseZMQTestCase):
         self.assertEqual(ctx.max_sockets, 100)
         self.assertEqual(ctx.get(zmq.MAX_SOCKETS), 100)
     
-    @skip_iron
+    @skip_ironpython
     def test_shadow(self):
         ctx = self.Context()
         ctx2 = self.Context.shadow(ctx.underlying)

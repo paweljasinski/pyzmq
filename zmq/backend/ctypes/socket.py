@@ -13,6 +13,7 @@
 import random
 import codecs
 import ctypes
+import sys
 
 import errno as errno_mod
 
@@ -22,7 +23,7 @@ from ._ctypes import libzmq, zmq_msg_t
 
 import zmq
 from zmq.error import ZMQError, _check_rc
-from zmq.utils.strtypes import unicode
+from zmq.utils.strtypes import unicode, IRONPYTHON2
 
 
 class Socket(object):
@@ -31,6 +32,10 @@ class Socket(object):
     _zmq_socket = None
     _closed = None
     _ref = None
+    @staticmethod
+    def hd(b):
+        for c in b:
+            print "%04x" % ord(c)
 
     def __init__(self, context, sock_type):
         self.context = context
@@ -85,7 +90,10 @@ class Socket(object):
 
     def set(self, option, value):
         if isinstance(value, unicode):
-            raise TypeError("unicode not allowed, use bytes")
+            if IRONPYTHON2:
+                value = bytes(value, 'iso-8859-1')
+            else:
+                raise TypeError("unicode not allowed, use bytes")
 
         if isinstance(value, bytes):
             if option not in zmq.constants.bytes_sockopts:
@@ -132,7 +140,10 @@ class Socket(object):
 
     def send(self, message, flags=0, copy=False, track=False):
         if isinstance(message, unicode):
-            raise TypeError("Message must be in bytes, not an unicode Object")
+            if IRONPYTHON2:
+                message = bytes(message, 'iso-8859-1')
+            else:
+                raise TypeError("Message must be in bytes, not an unicode Object")
 
         if isinstance(message, Frame):
             message = message.bytes

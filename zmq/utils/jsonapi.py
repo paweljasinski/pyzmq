@@ -15,7 +15,7 @@ Priority: ``simplejson`` > ``jsonlib2`` > stdlib ``json``
 # Copyright (C) PyZMQ Developers
 # Distributed under the terms of the Modified BSD License.
 
-from zmq.utils.strtypes import bytes, unicode
+from zmq.utils.strtypes import bytes, unicode, IRONPYTHON2
 import sys
 
 jsonmod = None
@@ -29,14 +29,14 @@ for mod in priority:
     else:
         break
 
-if sys.platform != 'cli' or sys.version_info[0] >= 3:
+if not IRONPYTHON2:
     def _squash_unicode(s):
         if isinstance(s, unicode):
             s = s.encode('utf8')
         return s
 else:
     def _squash_unicode(s):
-        # ironpython 2.7
+        # ironpython 2.x
         # just repackage as bytes
         return bytes(s, 'iso-8859-1')
 

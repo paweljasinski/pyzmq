@@ -7,11 +7,11 @@ from unittest import TestCase
 import zmq
 from zmq import devices
 
-from zmq.tests import BaseZMQTestCase, SkipTest, PYPY, Iron
+from zmq.tests import BaseZMQTestCase, SkipTest, PYPY, IRONPYTHON
 from zmq.utils.strtypes import unicode
 
 
-if PYPY or zmq.zmq_version_info() >= (4,1) or Iron:
+if PYPY or zmq.zmq_version_info() >= (4,1) or IRONPYTHON:
     # cleanup of shared Context doesn't work on PyPy
     # there also seems to be a bug in cleanup in libzmq-4.1 (zeromq/libzmq#1052)
     devices.Device.context_factory = zmq.Context
